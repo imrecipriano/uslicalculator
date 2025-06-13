@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ad Forecast</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gradient-to-br from-gray-50 to-blue-50 font-sans">
+  <div class="max-w-7xl mx-auto py-10 px-6">
+    <div class="text-center mb-6">
+      <h1 class="text-4xl font-extrabold text-blue-800">📊 Ad Forecast Calculator</h1>
+      <p class="text-gray-600 mt-2">Make data-driven decisions for your campaigns.</p>
+    </div>
+
+    <div class="bg-white p-8 rounded-2xl shadow-lg mb-10">
+      <h2 class="text-2xl font-semibold text-blue-700 mb-6">🛠 Input Data</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div><label class="block mb-1 font-medium text-sm text-gray-700">Selling Price (₱)</label><input id="sellingPrice" type="number" class="w-full p-3 border border-blue-200 rounded-xl shadow-sm" placeholder="e.g. 999"></div>
+        <div><label class="block mb-1 font-medium text-sm text-gray-700">COGS (₱)</label><input id="cogs" type="number" class="w-full p-3 border border-blue-200 rounded-xl shadow-sm" placeholder="e.g. 250"></div>
+        <div><label class="block mb-1 font-medium text-sm text-gray-700">Shipping Fee (₱)</label><input id="shippingFee" type="number" class="w-full p-3 border border-blue-200 rounded-xl shadow-sm" placeholder="e.g. 50"></div>
+        <div><label class="block mb-1 font-medium text-sm text-gray-700">Valuation Fee (%)</label><input id="valuationFee" type="number" class="w-full p-3 border border-blue-200 rounded-xl shadow-sm" placeholder="e.g. 2.5"></div>
+        <div><label class="block mb-1 font-medium text-sm text-gray-700">COD Fee (%)</label><input id="codFee" type="number" class="w-full p-3 border border-blue-200 rounded-xl shadow-sm" placeholder="e.g. 3"></div>
+        <div><label class="block mb-1 font-medium text-sm text-gray-700">VAT on COD (%)</label><input id="vatCod" type="number" class="w-full p-3 border border-blue-200 rounded-xl shadow-sm" placeholder="e.g. 12"></div>
+        <div><label class="block mb-1 font-medium text-sm text-gray-700">RTS Rate (%)</label><input id="rtsRate" type="number" class="w-full p-3 border border-blue-200 rounded-xl shadow-sm" placeholder="e.g. 18"></div>
+        <div><label class="block mb-1 font-medium text-sm text-gray-700">Ad Budget/Day (₱)</label><input id="adBudgetDay" type="number" class="w-full p-3 border border-blue-200 rounded-xl shadow-sm" placeholder="e.g. 3000"></div>
+        <div><label class="block mb-1 font-medium text-sm text-gray-700">Test Days</label><input id="testDays" type="number" class="w-full p-3 border border-blue-200 rounded-xl shadow-sm" placeholder="e.g. 7"></div>
+        <div><label class="block mb-1 font-medium text-sm text-gray-700">Target ROAS</label><input id="targetRoas" type="number" class="w-full p-3 border border-blue-200 rounded-xl shadow-sm" placeholder="e.g. 2.5"></div>
+        <div><label class="block mb-1 font-medium text-sm text-gray-700">Operational Expenses (₱)</label><input id="operationalExpenses" type="number" class="w-full p-3 border border-blue-200 rounded-xl shadow-sm" placeholder="e.g. 5000"></div>
+        <div><label class="block mb-1 font-medium text-sm text-gray-700">ODZ %</label><input id="odzPercent" type="number" class="w-full p-3 border border-blue-200 rounded-xl shadow-sm" placeholder="e.g. 1.5"></div>
+      </div>
+      <div class="flex justify-center gap-6 mt-8">
+        <button onclick="calculate()" class="bg-blue-600 text-white font-medium px-8 py-3 rounded-xl shadow hover:bg-blue-700">Calculate</button>
+        <button onclick="clearAll()" class="bg-gray-200 text-gray-800 font-medium px-8 py-3 rounded-xl shadow hover:bg-gray-300">Clear All</button>
+      </div>
+    </div>
+
+    <div class="mb-4 flex flex-wrap items-center gap-6">
+  <label><input type="checkbox" id="togglePreOrder" checked class="mr-2"> Show Pre-Order Costs</label>
+  <label><input type="checkbox" id="toggleCapital" checked class="mr-2"> Show Capital Expenses</label>
+  <label><input type="checkbox" id="toggleRts" checked class="mr-2"> Show RTS Loss</label>
+</div>
+<div id="preOrderSection" class="bg-white p-6 rounded-xl shadow mb-6">
+  <h3 class="text-xl font-semibold text-gray-700 mb-4">Pre-Order Costs</h3>
+  <ul class="space-y-2">
+    <li class="flex justify-between"><span>Total Shipping Fee:</span> <span id="preShipping">—</span></li>
+    <li class="flex justify-between"><span>Total Valuation Fee:</span> <span id="preValuation">—</span></li>
+    <li class="flex justify-between"><span>Total COD Fee Delivered:</span> <span id="preCOD">—</span></li>
+    <li class="flex justify-between"><span>Total VAT on COD Fee:</span> <span id="preVAT">—</span></li>
+    <li class="flex justify-between font-semibold border-t pt-2"><span>Total:</span> <span id="preTotal">—</span></li>
+  </ul>
+</div>
+<div id="capitalSection" class="bg-yellow-100 p-6 rounded-xl shadow mb-6">
+  <h3 class="text-xl font-semibold text-gray-700 mb-4">Capital Expenses</h3>
+  <ul class="space-y-2">
+    <li class="flex justify-between"><span>Total COG:</span> <span id="capitalCOG">—</span></li>
+    <li class="flex justify-between"><span>Operational Expenses:</span> <span id="capitalOPEX">—</span></li>
+    <li class="flex justify-between"><span>Total Ad Costs:</span> <span id="capitalAds">—</span></li>
+    <li class="flex justify-between font-semibold border-t pt-2"><span>Total:</span> <span id="capitalTotal">—</span></li>
+  </ul>
+</div>
+<div id="rtsSection" class="bg-red-100 p-6 rounded-xl shadow mb-6">
+  <h3 class="text-xl font-semibold text-gray-700 mb-4">RTS Losses (Projection)</h3>
+  <ul class="space-y-2">
+    <li class="flex justify-between"><span>Daily RTS Parcels:</span> <span id="rtsDaily">—</span></li>
+    <li class="flex justify-between"><span>Total RTS Parcels:</span> <span id="rtsTotal">—</span></li>
+    <li class="flex justify-between font-semibold border-t pt-2 text-red-700"><span>Shipping Loss from RTS:</span> <span id="rtsLoss">—</span></li>
+  </ul>
+</div>
+
+      <h2 class="text-2xl font-semibold text-white bg-blue-600 inline-block px-4 py-2 rounded-xl shadow mb-4">📈 Summary Metrics</h2>
+
+<div class="grid grid-cols-1 md:grid-cols-2 gap-y-6 gap-x-10 text-lg">
+        <div><span class="font-semibold text-gray-700">ODZ Deduction:</span> <span id="odzDeductDisplay" class="text-blue-800 text-2xl font-bold tracking-wide"></span></div>
+        <div><span class="font-semibold text-gray-700">Operational Expenses:</span> <span id="opExDisplay" class="text-blue-800 text-2xl font-bold tracking-wide"></span></div>
+        <div><span class="font-semibold text-gray-700">Total Ads Budget:</span> <span id="totalBudget" class="text-blue-800 text-2xl font-bold tracking-wide"></span></div>
+        <div><span class="font-semibold text-gray-700">Gross Revenue:</span> <span id="grossRevenue" class="text-blue-800 text-2xl font-bold tracking-wide"></span></div>
+        <div><span class="font-semibold text-gray-700">Parcels Shipped:</span> <span id="parcelsShipped" class="text-blue-800 text-2xl font-bold tracking-wide"></span></div>
+        <div><span class="font-semibold text-gray-700">Parcels Delivered:</span> <span id="parcelsDelivered" class="text-blue-800 text-2xl font-bold tracking-wide"></span></div>
+        <div><span class="font-semibold text-gray-700">Daily Shipped:</span> <span id="dailyShipped" class="text-blue-800 text-2xl font-bold tracking-wide"></span></div>
+        <div><span class="font-semibold text-gray-700">Daily Delivered:</span> <span id="dailyDelivered" class="text-blue-800 text-2xl font-bold tracking-wide"></span></div>
+        <div><span class="font-semibold text-gray-700">Target CPP:</span> <span id="targetCpp" class="text-blue-800 text-2xl font-bold tracking-wide"></span></div>
+        <div><span class="font-semibold text-gray-700">Breakeven CPP:</span> <span id="breakevenCpp" class="text-blue-800 text-2xl font-bold tracking-wide"></span></div>
+        <div><span class="font-semibold text-gray-700">Breakeven ROAS:</span> <span id="breakevenRoas" class="text-blue-800 text-2xl font-bold tracking-wide"></span></div>
+        <div><span class="font-semibold text-gray-700">Daily Profit:</span> <span id="dailyProfit" class="text-blue-800 text-2xl font-bold tracking-wide"></span></div>
+        <div><span class="font-semibold text-gray-700">Net Profit:</span> <span id="netProfit" class="text-blue-800 text-2xl font-bold tracking-wide"></span></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function calculate() {
+      const sellingPrice = +document.getElementById('sellingPrice').value;
+      const cogs = +document.getElementById('cogs').value;
+      const shippingFee = +document.getElementById('shippingFee').value;
+      const valuationFee = +document.getElementById('valuationFee').value / 100;
+      const codFee = +document.getElementById('codFee').value / 100;
+      const vatCod = +document.getElementById('vatCod').value / 100;
+      const rtsRate = +document.getElementById('rtsRate').value / 100;
+      const adBudgetDay = +document.getElementById('adBudgetDay').value;
+      const testDays = +document.getElementById('testDays').value;
+      const targetRoas = +document.getElementById('targetRoas').value;
+      const opEx = +document.getElementById('operationalExpenses').value || 0;
+      const odz = +document.getElementById('odzPercent').value / 100 || 0;
+
+      const totalAdBudget = adBudgetDay * testDays;
+      const cpp = sellingPrice / targetRoas; // Target CPP = Selling Price ÷ Target ROAS
+      const parcelsShipped = totalAdBudget / cpp;
+      const parcelsDelivered = parcelsShipped * (1 - rtsRate);
+
+      const valuationCost = sellingPrice * valuationFee * parcelsDelivered;
+      const codCost = sellingPrice * codFee * parcelsDelivered;
+      const vatOnCod = (sellingPrice * codFee * vatCod) * parcelsDelivered;
+      const costPerOrder = (cogs + shippingFee) * parcelsDelivered + valuationCost + codCost + vatOnCod;
+
+      const odzDeduct = sellingPrice * odz;
+      const grossRevenue = targetRoas * adBudgetDay * testDays;
+
+      const dailyShipped = Math.round(parcelsShipped / testDays);
+      const dailyDelivered = Math.round(parcelsDelivered / testDays);
+      const breakevenCpp = (costPerOrder + (rtsRate * costPerOrder) + totalAdBudget) / parcelsDelivered;
+      const breakevenRoas = breakevenCpp / sellingPrice;
+      const dailyProfit = (grossRevenue - costPerOrder - opEx - (odzDeduct * parcelsDelivered)) / testDays;
+      const costOfDelivered = (cogs + shippingFee) * parcelsDelivered; // unchanged
+      const costOfRTS = (cogs + shippingFee) * (parcelsShipped - parcelsDelivered);
+      const odzCost = odzDeduct * parcelsDelivered;
+      const netProfit = grossRevenue - (shippingFee * parcelsShipped + valuationCost + codCost + vatOnCod + (cogs * parcelsShipped) + opEx + totalAdBudget + odzCost + ((parcelsShipped * rtsRate) * shippingFee));
+
+      document.getElementById('totalBudget').textContent = `₱${totalAdBudget.toFixed(2)}`;
+      document.getElementById('grossRevenue').textContent = `₱${grossRevenue.toFixed(2)}`;
+      document.getElementById('parcelsShipped').textContent = `${parcelsShipped.toFixed(0)}`;
+      document.getElementById('parcelsDelivered').textContent = `${parcelsDelivered.toFixed(0)}`;
+      document.getElementById('dailyShipped').textContent = `${dailyShipped}`;
+      document.getElementById('dailyDelivered').textContent = `${dailyDelivered}`;
+      document.getElementById('targetCpp').textContent = `₱${cpp.toFixed(2)}`;
+      document.getElementById('breakevenCpp').textContent = `₱${breakevenCpp.toFixed(2)}`;
+      document.getElementById('breakevenRoas').textContent = `${breakevenRoas.toFixed(2)}`;
+      document.getElementById('dailyProfit').textContent = `₱${dailyProfit.toFixed(2)}`;
+      document.getElementById('netProfit').textContent = `₱${netProfit.toFixed(2)}`;
+      document.getElementById('preShipping').textContent = `₱${(shippingFee * parcelsShipped).toFixed(2)}`;
+      document.getElementById('preValuation').textContent = `₱${valuationCost.toFixed(2)}`;
+      document.getElementById('preCOD').textContent = `₱${codCost.toFixed(2)}`;
+      document.getElementById('preVAT').textContent = `₱${vatOnCod.toFixed(2)}`;
+      document.getElementById('preTotal').textContent = `₱${(shippingFee * parcelsShipped + valuationCost + codCost + vatOnCod).toFixed(2)}`;
+      document.getElementById('capitalCOG').textContent = `₱${(cogs * parcelsShipped).toFixed(2)}`;
+      document.getElementById('capitalOPEX').textContent = `₱${opEx.toFixed(2)}`;
+      document.getElementById('capitalAds').textContent = `₱${totalAdBudget.toFixed(2)}`;
+      document.getElementById('capitalTotal').textContent = `₱${(cogs * parcelsShipped + totalAdBudget + opEx).toFixed(2)}`;
+      document.getElementById('rtsDaily').textContent = `${Math.round(parcelsShipped * rtsRate / testDays)}`;
+      document.getElementById('rtsTotal').textContent = `${(parcelsShipped * rtsRate).toFixed(0)}`;
+      document.getElementById('rtsLoss').textContent = `₱${((parcelsShipped * rtsRate) * shippingFee).toFixed(2)}`;
+      document.getElementById('odzDeductDisplay').textContent = `₱${(odzDeduct * parcelsDelivered).toFixed(2)}`;
+      document.getElementById('opExDisplay').textContent = `₱${opEx.toFixed(2)}`;
+    }
+
+    function clearAll() {
+  document.querySelectorAll('input').forEach(el => el.value = '');
+  const blankFields = [
+    'totalBudget', 'grossRevenue', 'parcelsShipped', 'parcelsDelivered', 'dailyShipped', 'dailyDelivered',
+    'targetCpp', 'breakevenCpp', 'breakevenRoas', 'dailyProfit', 'netProfit', 'odzDeductDisplay', 'opExDisplay',
+    'preShipping', 'preValuation', 'preCOD', 'preVAT', 'preTotal',
+    'capitalCOG', 'capitalOPEX', 'capitalAds', 'capitalTotal',
+    'rtsDaily', 'rtsTotal', 'rtsLoss'
+  ];
+  blankFields.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = '';
+  });
+}
+  </script>
+<script>
+  document.getElementById('togglePreOrder').addEventListener('change', function() {
+    document.getElementById('preOrderSection').style.display = this.checked ? 'block' : 'none';
+  });
+  document.getElementById('toggleCapital').addEventListener('change', function() {
+    document.getElementById('capitalSection').style.display = this.checked ? 'block' : 'none';
+  });
+  document.getElementById('toggleRts').addEventListener('change', function() {
+    document.getElementById('rtsSection').style.display = this.checked ? 'block' : 'none';
+  });
+</script>
+</body>
+</html>
